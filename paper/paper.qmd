@@ -1,0 +1,177 @@
+---
+title: "Similar Names, Similar Tragedies: Do Their Musical Attributes Align?"
+subtitle: "A Data-Driven Exploration of Musical Attributes in Indie bands Her and Her's"
+author: 
+  - Shamayla Durrin 
+  - Krishna Kumar
+  - Denise Chang
+thanks: "Code and data are available at: [https://github.com/shamayla38/ProjectAboutHer](https://github.com/shamayla38/ProjectAboutHer)."
+date: today
+date-format: long
+abstract: In this paper, we explored the musical characteristics of two bands, Her and Her's, which share not only similar names but also equally tragic outcomes, by analyzing their musical attributes using Spotify data. We found that while both bands shared many similarities in their use of keys, energy levels, and other audio features, there were notable distinctions. Her showed a tendency toward more melancholic and introspective music, likely influenced by the illness of one of the band members, while Her's displayed more diversity and energy, consistent with the profile of an up-and-coming band before their tragic car crash. These differences offer insight into how external factors, such as health or career trajectory, may have influenced their musical output.
+format: pdf
+number-sections: true
+bibliography: references.bib 
+---
+
+# Introduction
+
+The indie music world suffered two significant tragedies with the abrupt losses of Her and Her's, two bands that not only shared similar names but also faced equally heartbreaking endings. The UK-based band Her's, known for their vibrant energy and growing success, was tragically killed in a car crash while touring the United States in 2019. [@cnn2019] On the other hand, the French band Her, whose music carried deep emotional weight, saw one of its members, Simon Carpentier, silently battle with cancer, which ultimately claimed his life in 2017. [@nme2018]
+
+Given their tragic stories, this study aims to explore how similar these bands were in terms of their musical attributes, using data from Spotify. Through an analysis of key audio features like energy, tempo, valence, and the use of minor keys, we find notable differences between the two. Her tends to create music with lower energy, slower tempo, and more songs in minor keys, which often reflect a more melancholic or introspective tone. This might be an indication of Carpentier's personal struggles during the band's active years. In contrast, Her's demonstrated higher energy and a more upbeat tone, in line with their image as an emerging band full of potential before their abrupt end.
+
+# Data
+
+For this analysis, we used the 'spotifyr' [@spotifyr] package, which provides an interface to the spotify API [@spotifyAPI]. Through this package, we retrieved the musical attributes of the two bands, Her and Her's. The dataset includes detailed audio features for each track, such as valence (a measure of the positivity of a track), tempo (the speed of the track in beats per minute), energy (a measure of intensity and activity), key, mode (major or minor) of each track etc. which allowed us to compare the emotional tone and musical structure between the two artists. The 'dplyr' [@dplyr], 'ggplot' [@ggplot2], and 'patchwork' [@patchwork] packages were used for data processing and visualization.
+
+## Differences in Valence, Tempo, and Energy Between Her and Her's
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+library(ggplot2)
+library(patchwork) 
+library(dplyr)
+```
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+#Reading the data 
+hers_data <- readRDS("../data/hers.rds")
+her_data <- readRDS("../data/her.rds")
+
+```
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+# Add a new column to each dataset to indicate the artist
+her_data$artist <- "Her"
+hers_data$artist <- "Her's"
+# Combine the two datasets into one
+combined_data <- bind_rows(her_data, hers_data)
+
+```
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+# Create boxplots for Valence, Tempo, and Energy
+valence_plot <- ggplot(combined_data, aes(x = artist, y = valence, fill = artist)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Valence Comparison", x = NULL , y = "Valence") +
+  theme(plot.title = element_text(size = 8),axis.title.y = element_text(size = 8),legend.title = element_text(size = 8)) + scale_fill_manual(values = c("Her" = "coral3", "Her's" = "darkseagreen"))
+
+
+tempo_plot <- ggplot(combined_data, aes(x = artist, y = tempo, fill = artist)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Tempo Comparison", x = NULL, y = "Tempo (BPM)") +
+  theme(plot.title = element_text(size = 8),axis.title.y = element_text(size = 8),legend.title = element_text(size = 8)) + scale_fill_manual(values = c("Her" = "coral3", "Her's" = "darkseagreen"))
+
+energy_plot <- ggplot(combined_data, aes(x = artist, y = energy, fill = artist)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Energy Comparison", x = NULL, y = "Energy") +
+  theme(plot.title = element_text(size = 8),axis.title.y = element_text(size = 8),legend.title = element_text(size = 8)) + scale_fill_manual(values = c("Her" = "coral3", "Her's" = "darkseagreen"))
+
+combined_plot <- valence_plot + tempo_plot + energy_plot + 
+  plot_layout(ncol = 3, nrow = 1)
+```
+
+```{r, fig.width=10, fig.height=5}
+#| echo: false
+#| label: fig-compare
+
+combined_plot
+```
+
+As seen in @fig-compare, the two bands share some overlap in their musical characteristics, but Her tends to have lower valence, tempo, and energy, while Her's shows higher medians in all three attributes. This could indicate that while they share some stylistic similarities, may have a more melancholic or subdued emotional tone, possibly influenced by the illness of their band member, Simon Carpentier compared to the more energetic and faster-paced music of Her's.
+
+## Comparison of Modality (Major vs. Minor Keys)
+
+```{r}
+#| echo: false
+#| label: fig-compare2
+# Convert mode to a factor with labels (0 = Minor, 1 = Major)
+combined_data$mode_label <- factor(combined_data$mode, levels = c(0, 1), labels = c("Minor", "Major"))
+
+# Create a bar plot to compare the modes (major vs minor) used by both artists, showing proportions
+mode_proportion_plot <- ggplot(combined_data, aes(x = mode_label, fill = artist)) +
+  geom_bar(position = "fill") +  # Use "fill" to normalize bars to 1 (proportion)
+  theme_minimal() +
+  labs(title = "Mode (Major/Minor) Proportion by Artist", x = "Mode (Major or Minor)", y = "Proportion") +
+  theme(
+    plot.title = element_text(size = 8),
+    axis.title.x = element_text(size = 8),
+    axis.title.y = element_text(size = 8),
+    axis.text.x = element_text(size = 8),
+    axis.text.y = element_text(size = 8),
+    legend.title = element_text(size = 8),
+    legend.text = element_text(size = 8)
+  ) +
+  scale_fill_manual(values = c("Her" = "coral3", "Her's" = "darkseagreen"))  # Custom colors for the artists
+
+# Display the mode proportion plot
+print(mode_proportion_plot)
+
+
+```
+
+In @fig-compare2 we see the comparison of Her and Her's in terms of major and minor key distribution. We notice that both artists have a similar balance between the two. However, Her tends to use slightly more minor keys compared to Her's, which may indicate that Her's music is somewhat more melancholic or introspective. In contrast, Her's has a slightly greater proportion of major keys, suggesting a relatively more cheerful or upbeat tone in their music.This is consistent with what we saw in terms of valence, energy and tempo.
+
+## Comparison of Key Distribution and Musical Style Diversity
+
+```{r}
+#| echo: false
+#| label: fig-compare3
+#| warning: false
+# Convert key values to labels (0-11 mapped to musical notes)
+key_labels <- c("C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B")
+combined_data$key_label <- factor(combined_data$key, levels = 0:11, labels = key_labels)
+
+# Calculate proportions of songs for each artist by key
+proportion_data <- combined_data %>%
+  group_by(artist, key_label) %>%
+  summarise(count = n()) %>%
+  group_by(artist) %>%
+  mutate(proportion = count / sum(count))  # Calculate proportions
+
+# Plot proportions with side-by-side bars
+key_side_by_side_proportion_plot <- ggplot(proportion_data, aes(x = key_label, y = proportion, fill = artist)) +
+  geom_bar(stat = "identity", position = "dodge") +  # "dodge" places bars side by side
+  theme_minimal() +
+  labs(title = "Proportional Key Distribution by Artist", x = "Key", y = "Proportion") +
+  theme(
+    plot.title = element_text(size = 8),
+    axis.title.x = element_text(size = 8),
+    axis.title.y = element_text(size = 8),
+    axis.text.x = element_text(size = 8),
+    axis.text.y = element_text(size = 8),
+    legend.title = element_text(size = 8),
+    legend.text = element_text(size = 8)
+  ) +
+  scale_fill_manual(values = c("Her" = "coral3", "Her's" = "darkseagreen"))  # Custom colors for artists
+
+# Display the plot
+print(key_side_by_side_proportion_plot)
+
+```
+
+@fig-compare3 shows the key distribution comparison between Her and Her's. We notice both similarities and differences in their musical choices. While both artists use a variety of keys, Her shows a stronger preference for keys like C#/Db and G, whereas Her's tends to favor keys such as F#/Gb and B. Additionally, Her's exhibits a more balanced distribution of keys overall, whereas Her concentrates more heavily on a few specific keys. This suggests that Her tends to focus on a more specific musical style,while Her's demonstrates a more diverse approach by using a wider variety of keys in their music.
+
+# Discussion
+
+In this analysis, we compared the musical attributes of the two indie bands, Her and Her's, both of whom experienced tragic losses. Our results show that while both bands have similarities in their use of musical features like keys and energy, there are some clear differences. Her's music tends to have higher energy and faster tempos, which aligns with their rise in popularity before their fatal car crash. In contrast, Her's music often features lower energy and more use of minor keys, which might reflect a more introspective or melancholic style, possibly influenced by Simon Carpentier's illness.
+
+These differences suggest that factors like personal struggles and career stage may have influenced the music each band produced. Her's more upbeat tracks could reflect their growth and excitement as a rising band, while Her's more subdued tone might have been shaped by the emotional challenges they faced.
+
+Future research could explore whether the bands' popularity increased after their tragic events. With access to historical streaming or sales data, we could analyze whether their music gained more attention following these incidents, helping us better understand how public reception might be shaped by such events.
+
+# Bibliography
