@@ -5,7 +5,6 @@
 # Contact: shamayla.islam@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: N.A
-# Any other information needed? N.A
 
 # Load necessary libraries
 library(spotifyr)
