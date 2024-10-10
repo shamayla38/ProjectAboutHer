@@ -22,7 +22,7 @@ Given their tragic stories, this study aims to explore how similar these bands w
 
 # Data
 
-For this analysis, we used the 'spotifyr' [@spotifyr] package, which provides an interface to the spotify API [@spotifyAPI]. Through this package, we retrieved the musical attributes of the two bands, Her and Her's. The dataset includes detailed audio features for each track, such as valence (a measure of the positivity of a track), tempo (the speed of the track in beats per minute), energy (a measure of intensity and activity), key, mode (major or minor) of each track etc. which allowed us to compare the emotional tone and musical structure between the two artists. The 'dplyr' [@dplyr], 'ggplot' [@ggplot2], and 'patchwork' [@patchwork] packages were used for data processing and visualization.
+The statistical programming language R [@citeR] is used to process the raw data. For the analysis, we used the `spotifyr` [@spotifyr] package, which provides an interface to the Spotify API [@spotifyAPI]. Through this package, we retrieved the musical attributes of the two bands, Her and Her's. The data set includes detailed audio features for each track, such as valence (a measure of the positivity of a track), tempo (the speed of the track in beats per minute), energy (a measure of intensity and activity), key, mode (major or minor) of each track etc. which allowed us to compare the emotional tone and musical structure between the two artists. The `dplyr` [@dplyr], `ggplot2` [@ggplot2], and `patchwork` [@patchwork] packages were used for data processing and visualization.
 
 ## Differences in Valence, Tempo, and Energy Between Her and Her's
 
@@ -61,7 +61,8 @@ combined_data <- bind_rows(her_data, hers_data)
 #| include: false
 #| warning: false
 #| message: false
-# Create boxplots for Valence, Tempo, and Energy
+
+# Create box plots for Valence, Tempo, and Energy
 valence_plot <- ggplot(combined_data, aes(x = artist, y = valence, fill = artist)) +
   geom_boxplot() +
   theme_minimal() +
@@ -88,6 +89,7 @@ combined_plot <- valence_plot + tempo_plot + energy_plot +
 ```{r, fig.width=10, fig.height=5}
 #| echo: false
 #| label: fig-compare
+#| fig-cap: Comparing the Distribution of Valence, Tempo and Energy of Musical Tracks Between the Two Bands
 
 combined_plot
 ```
@@ -99,6 +101,7 @@ As seen in @fig-compare, the two bands share some overlap in their musical chara
 ```{r}
 #| echo: false
 #| label: fig-compare2
+#| fig-cap: Comparing the Distribution of Modality of Musical Tracks Between the Two Bands
 # Convert mode to a factor with labels (0 = Minor, 1 = Major)
 combined_data$mode_label <- factor(combined_data$mode, levels = c(0, 1), labels = c("Minor", "Major"))
 
@@ -106,9 +109,8 @@ combined_data$mode_label <- factor(combined_data$mode, levels = c(0, 1), labels 
 mode_proportion_plot <- ggplot(combined_data, aes(x = mode_label, fill = artist)) +
   geom_bar(position = "fill") +  # Use "fill" to normalize bars to 1 (proportion)
   theme_minimal() +
-  labs(title = "Mode (Major/Minor) Proportion by Artist", x = "Mode (Major or Minor)", y = "Proportion") +
+  labs(x = "Mode (Major or Minor)", y = "Proportion") +
   theme(
-    plot.title = element_text(size = 8),
     axis.title.x = element_text(size = 8),
     axis.title.y = element_text(size = 8),
     axis.text.x = element_text(size = 8),
@@ -132,6 +134,7 @@ In @fig-compare2 we see the comparison of Her and Her's in terms of major and mi
 #| echo: false
 #| label: fig-compare3
 #| warning: false
+#| fig-cap: Comparing the Distribution of Keys Musical Tracks Between the Two Bands
 # Convert key values to labels (0-11 mapped to musical notes)
 key_labels <- c("C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B")
 combined_data$key_label <- factor(combined_data$key, levels = 0:11, labels = key_labels)
@@ -147,9 +150,8 @@ proportion_data <- combined_data %>%
 key_side_by_side_proportion_plot <- ggplot(proportion_data, aes(x = key_label, y = proportion, fill = artist)) +
   geom_bar(stat = "identity", position = "dodge") +  # "dodge" places bars side by side
   theme_minimal() +
-  labs(title = "Proportional Key Distribution by Artist", x = "Key", y = "Proportion") +
+  labs( x = "Key", y = "Proportion") +
   theme(
-    plot.title = element_text(size = 8),
     axis.title.x = element_text(size = 8),
     axis.title.y = element_text(size = 8),
     axis.text.x = element_text(size = 8),
@@ -174,4 +176,4 @@ These differences suggest that factors like personal struggles and career stage 
 
 Future research could explore whether the bands' popularity increased after their tragic events. With access to historical streaming or sales data, we could analyze whether their music gained more attention following these incidents, helping us better understand how public reception might be shaped by such events.
 
-# Bibliography
+# References
