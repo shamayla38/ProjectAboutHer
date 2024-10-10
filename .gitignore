@@ -2,5 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+<<<<<<< HEAD
 .Rbuildignore
 .Rapp.history
+=======
+.Rapp.history
+>>>>>>> 7a43929352f90672fc4b395a8e96bc3e7a9224c6
